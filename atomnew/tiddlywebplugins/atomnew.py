@@ -18,12 +18,14 @@ def init(config):
 
 class Serialization(SerializationInterface):
     def __init__(self,environ):
-      if environ and 'tiddlyweb.query' not in environ:
+      if not environ:
+        environ = {}
+      if 'tiddlyweb.query' not in environ:
         environ['tiddlyweb.query'] = {}
-        environ['tiddlyweb.query']['fat'] = 'y'
+      environ['tiddlyweb.query']['fat'] = 'y'
       self.environ=environ
       self._bag_perms_cache = {}
-    
+      
     def tiddler_dump(self,tiddler,baseurl):
       output = u""
       url = "%s%s"%(baseurl,urllib.quote(tiddler["title"]))
@@ -33,7 +35,7 @@ class Serialization(SerializationInterface):
       else:
         modifier_string = "<author><name></name></author>"
       if "type" in tiddler:
-        if tiddler["type"] != "html":
+        if tiddler["type"] != "None":
           tidType = tiddler["type"]
           mode = 'mode="base64" '
         else:
@@ -56,21 +58,21 @@ class Serialization(SerializationInterface):
 	%s
 	%s
 	<updated>%s</updated>
-  """%(cgi.escape(tiddler["title"]),url,url,text,modifier_string,date)
+"""%(cgi.escape(tiddler["title"]),url,url,text,modifier_string,date)
       for tag in tiddler["tags"]:
-        output += u'''
-        	<category term="%s"/>
-        '''%cgi.escape(tag)
+        output += u'''	<category term="%s"/>
+'''%cgi.escape(tag)
       
       if "geo.long" in tiddler["fields"] and "geo.lat" in tiddler["fields"]:
         lat = tiddler["fields"]["geo.lat"]
         lon = tiddler["fields"]["geo.long"]
-        output +=u"""
-	<georss:point>%s %s</georss:point>
+        output +=u"""	<georss:point>%s %s</georss:point>
 	<geo:lat>%s</geo:lat>
 	<geo:long>%s</geo:long>
 """%(lat,lon,lat,lon)
-      output += u"</entry>"
+      output += '''
+</entry>
+'''
       return output
       
     def dump(self, obj, otype):

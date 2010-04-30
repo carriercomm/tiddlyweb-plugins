@@ -24,11 +24,11 @@ def render(tiddler, environ):
     else:
         path = ''
     html = wikitext_to_wikklyhtml('%s/' % server_prefix,
-            path, tiddler.text, environ)
+            path, tiddler.text, environ,tiddler=tiddler,bag=tiddler.bag)
     return unicode(html, 'utf-8')
 
 
-def wikitext_to_wikklyhtml(base_url, path_url, wikitext, environ):
+def wikitext_to_wikklyhtml(base_url, path_url, wikitext, environ,tiddler=False,bag=False,wikiwords=False):
     """
     Turn a wikitext into HTML.
     base_url: starting url for links in the wikitext (e.g. '/')
@@ -51,9 +51,17 @@ def wikitext_to_wikklyhtml(base_url, path_url, wikitext, environ):
     link_context = {
             '$BASE_URL': '%s%s' % (base_url, path_url),
             '$REFLOW': 0}
+    plugindir = environ.get('tiddlyweb.config', {}).get('wikklytext.plugin-dir','')
     try:
-        html, context = wikklytext.WikklyText_to_InnerHTML(
+        context = wikklytext.WikContext(plugin_dirs=plugindir,url_resolver=our_resolver)
+        context.environ = environ
+        context.bag = bag
+        context.tiddler = tiddler
+        context.wikiwords = wikiwords
+        html,newcontext = wikklytext.WikklyText_to_InnerHTML(
                 text=wikitext,
+                context = context,
+                plugin_dirs=plugindir,
                 setvars=link_context,
                 encoding='utf-8',
                 safe_mode=safe_mode_setting,
@@ -61,6 +69,7 @@ def wikitext_to_wikklyhtml(base_url, path_url, wikitext, environ):
                 tree_posthook=posthook.treehook)
     except wikklytext.WikError, exc:
         html = '<pre>Unable to render wikitext: %s</pre>' % exc
+    
     return html
 
 

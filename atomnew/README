@@ -1,1 +1,7 @@
 an improved atom feed
+
+*** allows customisations ***
+
+
+*** provides enriched atom feeds ***
+The new version is geo friendly - mapping the tiddler fields geo.lat and geo.long to valid atom feed tags.

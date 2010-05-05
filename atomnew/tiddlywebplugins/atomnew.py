@@ -64,7 +64,7 @@ class Serialization(SerializationInterface):
             quoteBag = urllib.quote(bagname)
             url = "%s%s"%(baseurl,quoteTitle)
             mode =''
-            id = "%s/%s/%s"%(quoteBag,quoteTitle,tiddler['revision'])
+            id = mapper("id",tiddler,"%s/%s/%s"%(quoteBag,quoteTitle,tiddler['revision']))
             if 'modifier' in tiddler:
                 modifier_string = u"<author><name>%s</name></author>"%mapper('author',tiddler,tiddler['modifier'])
             else:

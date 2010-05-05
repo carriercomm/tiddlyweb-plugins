@@ -77,6 +77,7 @@ feed.link::http://tiddlyweb.com/foo
 !bags/foo
 entry.title::<<echo gtitle>>
 entry.link::/posts/<<echo "file.html">>
+entry.id::bar
 
 !recipes/friends
 entry.content::hello world content
@@ -105,7 +106,7 @@ entry.content::hello world content
   assert '<link rel="alternate" type="text/html" href="http://friends.com/posts/file.html"/>' in text
   assert '<title>AtomSettings</title>' not in text
   assert 'hello world content' in text
-  
+  assert '<id>bar</id>' in text
   s.environ['selector.vars'] = {'bag_name':'notfoo'}
   newtext = s.dump([tid2,atoms],'list')
   assert 'hello world content' not in newtext

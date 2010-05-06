@@ -1,4 +1,4 @@
-from tiddlywebplugins.atomnew import Serialization as NewAtom
+from tiddlywebplugins.atomplus import Serialization as NewAtom
 from tiddlyweb.model.bag import Bag
 from tiddlyweb.model.tiddler import Tiddler
 from tiddlyweb.model.recipe import Recipe

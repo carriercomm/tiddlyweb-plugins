@@ -33,7 +33,7 @@ class Serialization(SerializationInterface):
             
         def tiddler_dump(self,tiddler,baseurl,active_resource=False,atomconfig={}):
             output = u""
-            quoteTitle = urllib.quote(tiddler["title"])
+            quoteTitle = urllib.quote(tiddler["title"].encode("utf-8"))
             bagname = tiddler["bag"]
             if "excludeAtom" in tiddler["tags"]:
                 return ""

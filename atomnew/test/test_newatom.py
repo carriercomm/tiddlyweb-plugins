@@ -1,3 +1,4 @@
+# coding=utf-8
 from tiddlywebplugins.atomplus import Serialization as NewAtom
 from tiddlyweb.model.bag import Bag
 from tiddlyweb.model.tiddler import Tiddler
@@ -122,6 +123,11 @@ def test_as_tiddler():
   assert '<link rel="alternate" type="text/html" href="http://jonrobson.me.uk/myfoo/foobar"/>' in text
   assert '2009-12-25T10:20:30' in text
   assert '<category term="chicken"/>' in text
+  
+  tiddler['title']= u"Cà Phê VN"
+  tiddler['tags'] = [u'à']
+  tiddler['text']=  u"àààààà"
+  text = s.tiddler_dump(tiddler,'http://jonrobson.me.uk/myfoo/')
   
 def test_as_tiddler_geo():
   tiddler = {"bag":"geo","revision":2,"title":"London & Me","fields":{"geo.lat":"50","geo.long":"0.01"},"text":"The big smoke.","tags":[],"modified":"20021025102030"}

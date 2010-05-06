@@ -139,7 +139,7 @@ class Serialization(SerializationInterface):
                     
                 if not ignore_following:
                     try:
-                        name,val = setting_line.split("::")
+                        name,val = setting_line.split(":")
                         name_resource_parent,name_resource_tag = name.split(".")
                         if name_resource_parent == 'feed':
                             if not active_resource or resource_uri == u"/".join(active_resource):

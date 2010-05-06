@@ -21,8 +21,8 @@ def clear_store():
 
 def test_read_atomsettings():
   tid = {"bag":"notfoo","revision":1,"title":"AtomSettings","fields":{},"tags":['excludeAtom'],"text":'''!bags/foo
-entry.title::<<echo title>>
-entry.link::/posts/file.html
+entry.title:<<echo title>>
+entry.link:/posts/file.html
 '''}
   s = NewAtom({})
   settings = s.read_atom_settings(tid['text'])
@@ -31,15 +31,15 @@ entry.link::/posts/file.html
   assert settings['bags']['foo']['title'] == u"<<echo title>>"
   assert settings['bags']['foo']['link'] == u"/posts/file.html"
   
-  tid['text'] = '''feed.title::jon
+  tid['text'] = '''feed.title:jon
 !recipes/jon
-feed.title::jon overridden
+feed.title:jon overridden
 
   !bags/bar
 !bags/foo
-feed.title::xyz
-entry.title::x
-entry.ignoreline:z
+feed.title:xyz
+entry.title:x
+entry.ignoreline;z
 !badline
 '''
   settings = s.read_atom_settings(tid['text'],"recipes/jon")
@@ -54,13 +54,13 @@ entry.ignoreline:z
   
   tid['text'] = '''!notfoo
 !bags/dumbar
-entry.title::dumbar tiddler
+entry.title:dumbar tiddler
 !published_articles_en
-entry.title::<<view heading>>
-feed.title::broken title
-entry.text::<<view summary>>  
+entry.title:<<view heading>>
+feed.title:broken title
+entry.text:<<view summary>>  
 !/bags/test
-feed.title::wont work
+feed.title:wont work
 '''
   settings = s.read_atom_settings(tid['text'],"recipes/ben")
   assert 'notfoo' not in settings['bags']
@@ -71,16 +71,16 @@ feed.title::wont work
 def test_with_customisations():
   clear_store()
   atoms = {"bag":"notfoo","revision":1,"title":"AtomSettings","fields":{},"tags":['excludeAtom'],"text":'''!recipes/friends
-feed.title::Jons Wacky Atom Feed
-feed.link::http://tiddlyweb.com/foo
+feed.title:Jons Wacky Atom Feed
+feed.link:http://tiddlyweb.com/foo
 
 !bags/foo
-entry.title::<<echo gtitle>>
-entry.link::/posts/<<echo "file.html">>
-entry.id::bar
+entry.title:<<echo gtitle>>
+entry.link:/posts/<<echo "file.html">>
+entry.id:bar
 
 !recipes/friends
-entry.content::hello world content
+entry.content:hello world content
 '''}
   tid1 = {"bag":"foo","revision":1,"title":"Tiddler1","fields":{},"tags":[],"text":"Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."}
   tid2 = {"bag":"notfoo","revision":1,"title":"Tiddler2","fields":{},"tags":[],"text":"Magic"}

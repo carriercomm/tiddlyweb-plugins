@@ -3,7 +3,7 @@ AUTHOR = 'Jon Robson'
 AUTHOR_EMAIL = 'jdlrobson@gmail.com'
 NAME = 'tiddlywebplugins.wikklytextplugins'
 DESCRIPTION = ''
-VERSION = '0.52'
+VERSION = '0.53'
 
 import os
 from setuptools import setup, find_packages

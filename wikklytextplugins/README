@@ -1,4 +1,5 @@
-Adds missing serverside versions of TiddlyWiki to TiddlyWeb
+Adds missing serverside versions of TiddlyWiki to TiddlyWeb macros
+Currently the view,tiddler and tags macro.
 
 Currently requires WikklyText 1.93 TEST
 which you currently manually have to install

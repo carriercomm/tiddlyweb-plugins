@@ -10,8 +10,10 @@ from tiddlyweb.model.tiddler import Tiddler
 from tiddlyweb.store import Store, NoBagError,NoTiddlerError
 from tiddlywebplugins.wikklytextplugins.filterer import Filterer as FilterThingy
 from tiddlyweb import control
-
+from tiddlyweb.web.util import encode_name
 from datetime import date
+def _throw_error():
+    return "<span class='wikkly-error-container'>running old version of TiddlyWeb</span>"  
 def tiddler(context, *args):
     base = context.var_get_text("$BASE_URL")
     path =""
@@ -20,7 +22,7 @@ def tiddler(context, *args):
     try:
         environ = context.environ
     except NoAttributeError:
-        return ""  
+        return _throw_error()
     try:
         tid = context.tiddler
     except NoAttributeError:
@@ -123,7 +125,7 @@ def _view_transform(context,value,vtype,named_args={}):
     out = ""
     for value in values:
         if not vtype or vtype =='text':
-            transformed = value.decode("utf-8")
+            transformed = value
             out += transformed
         elif vtype == 'wikified':
             out += wikitext_to_wikklyhtml(base,path, value, environ,tiddler=context.tiddler)
@@ -148,7 +150,10 @@ def _view_transform(context,value,vtype,named_args={}):
     return out
     
 def tags(context,*args):
-    tiddler = context.tiddler
+    try:
+        tiddler = context.tiddler
+    except NoAttributeError:
+        return _throw_error()
     tagresult = "<ul>"
   
     if len(tiddler.tags) == 0:
@@ -164,6 +169,11 @@ def tags(context,*args):
   
 def view(context, *args):
     params = []
+    try:
+        environ = context.environ
+    except NoAttributeError:
+        return _throw_error()
+        
     for p in args:
         params.append(p.text)
     try:

@@ -1,6 +1,7 @@
 from tiddlywebplugins.wikklytextplugins.plugins import macros
 from tiddlyweb.model.tiddler import Tiddler
 from tiddlywebplugins import wikklytextplugins
+from tiddlywebplugins import wikklytextrender
 from tiddlyweb.config import config
 from test_common import WikiArgument,WikiContext
 
@@ -64,5 +65,5 @@ def test_view_link():
     test_tiddler.fields['bar'] = "80 days"
     test_tiddler.text = "<<view bar linkexternal withlotsargument: 'wondering how this might show' inparams: becauseihavenoidea foo:bar prefix:'around the world in/'>>"
     wikklytextplugins.init(config)
-    text = wikklytextplugins.new_render(test_tiddler,{'tiddlyweb.config':config})
+    text = wikklytextrender.render(test_tiddler,{'tiddlyweb.config':config})
     assert 'around the world in/80%20days' in text

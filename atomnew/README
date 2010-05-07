@@ -1,6 +1,7 @@
-an improved atom feed
+a customisable atom feed
 
 *** allows customisations ***
+An AtomViewTemplate tiddler was considered, however introducing such a mechanism would have created a wealth of problems including invalid w3c markup, an rss item inside an atom feed? Treating bags differently would have required multiple atom template tiddlers which would have been a pain to manage. The simplest solution seemed to be the AtomSettings tiddler (Easy to parse and hopefully readable)
 
 
 *** provides enriched atom feeds ***

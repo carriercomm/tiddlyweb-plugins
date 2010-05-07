@@ -1,5 +1,5 @@
 # coding=utf-8
-from tiddlywebplugins.atomplus import Serialization as NewAtom
+from tiddlywebplugins.atomcustom import Serialization as NewAtom
 from tiddlyweb.model.bag import Bag
 from tiddlyweb.model.tiddler import Tiddler
 from tiddlyweb.model.recipe import Recipe
@@ -71,7 +71,7 @@ feed.title:wont work
   
 def test_with_customisations():
   clear_store()
-  atoms = {"bag":"notfoo","revision":1,"title":"AtomSettings","fields":{},"tags":['excludeAtom'],"text":'''!recipes/friends
+  atoms = {"bag":"notfoo","revision":1,"title":"AtomSettings","fields":{},"tags":['excludeAtom'],"text":u'''!recipes/friends
 feed.title:Jons Wacky Atom Feed
 feed.link:http://tiddlyweb.com/foo
 
@@ -80,12 +80,17 @@ entry.title:<<echo gtitle>>
 entry.link:/posts/<<echo "file.html">>
 entry.id:bar
 
+!bags/pooh
+entry.title:a tiddler from pooh
+entry.content:winnie the pooh
+
 !recipes/friends
-entry.content:hello world content
+entry.content:hello world content Cà Phê VN
 '''}
   tid1 = {"bag":"foo","revision":1,"title":"Tiddler1","fields":{},"tags":[],"text":"Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."}
   tid2 = {"bag":"notfoo","revision":1,"title":"Tiddler2","fields":{},"tags":[],"text":"Magic"}
   tid3 = {"bag":"foo","revision":1,"title":"Tiddler3","fields":{},"tags":[],"text":"Hello"}
+  tid4 = {"bag":"pooh","revision":1,"title":"Tigger","fields":{},"tags":[],"text":"Rabbit"} 
   store.put(Bag("notfoo"))
   store.put(Bag("foo"))
   r =Recipe("friends")
@@ -98,20 +103,29 @@ entry.content:hello world content
   newconfig['server_prefix']='stuff'
   newconfig['server_host']={'scheme':'http','host':'friends.com'}
   s = NewAtom({'tiddlyweb.store':store,'selector.vars':{'recipe_name':'friends'},'SCRIPT_URI':'/feeds','tiddlyweb.config':newconfig})
-  text = s.dump([tid1,tid2,tid3,atoms],'list')
+  text = s.dump([tid1,tid2,tid3,tid4,atoms],'list')
+  
+  print "#############"
   print text
+  print "#############"
   assert '<title>Jons Wacky Atom Feed</title>' in text
   assert '<title>Tiddler2' in text
   assert '<link rel="alternate" type="text/html" href="http://friends.com/stuff/recipes/friends/tiddlers/Tiddler2"/>' in text
   assert '<title>gtitle</title>' in text
   assert '<link rel="alternate" type="text/html" href="http://friends.com/posts/file.html"/>' in text
   assert '<title>AtomSettings</title>' not in text
-  assert 'hello world content' in text
+  assert u'hello world content Cà Phê VN' in text
   assert '<id>bar</id>' in text
+  assert 'a tiddler from pooh</title>' in text
+  assert 'Rabbit' not in text
+  assert 'Tigger</title>' not in text
+  assert 'winnie the pooh' not in text
+  
   s.environ['selector.vars'] = {'bag_name':'notfoo'}
   newtext = s.dump([tid2,atoms],'list')
   assert 'hello world content' not in newtext
- 
+
+  
 
 def test_as_tiddler():
   tiddler = {"bag":"bag","revision":1,"title":"foobar","fields":{},"text":"I like chicken.","tags":['chicken','food','love'],"modified":"20091225102030"}

@@ -1,14 +1,19 @@
 from tiddlyweb import control
 import logging
+from tiddlyweb.model.bag import Bag
+
 class Filterer:
   def __init__(self):
     self.filter = u""
     self.arg1 = ""
     self.arg2 = ""
     self.foo = "yes"
+    self.and_tiddlers = []
   def reset_args(self):
     self.arg1 = ""
     self.arg2 = ""
+    
+    
   def write_to_arg1(self,token):
     if token and token != "[" and token != "]":
       self.arg1 += token
@@ -17,6 +22,8 @@ class Filterer:
       self.arg2 += token
   def addTiddler(self):
     logging.debug("addTiddler find %s"%self.arg1)
+    
+    #print "Add tiddler %s"%self.arg1
     for i in self.bag.list_tiddlers():
       if i.title == self.arg1:
         logging.debug("addTiddler added %s"%self.arg1)
@@ -32,84 +39,83 @@ class Filterer:
       limit -= 1
     self.final_tiddlers = limited_tiddlers
   def apply_sort(self):
-    field = self.arg2
-    
-    desc = False
-    if field[0] == '-':
-      desc = True
-      field = field[1:]
-    elif field[0] == '+':
-      field = field[1:]
-    logging.debug("apply_sort: applying sort on %s desc=%s"%(field,desc))
-    def sorter(a,b):
-      logging.debug("apply_sort: sorting by %s on %s and %s"%(field,a,b))
-      try:
-        val1 = getattr(a,field)
-      except AttributeError:
-        try:
-          val1 = a.fields[field]
-        except KeyError:
-          val1 = False
-      try:
-        val2 = getattr(b,field)
-      except AttributeError:
-        try:
-          val2 = b.fields[field]
-        except KeyError:
-          val2 = False
-      logging.debug("apply_sort: testing %s vs %s"%(val1,val2))
-      if val1 < val2:
-        if desc:
-          return 1
-        else:
-          return -1
-      elif val2 < val1:
-        if desc:
-          return -1
-        else: 
-          return 1
-      else:
-        return 0
-        
-      
-    self.final_tiddlers.sort(sorter)
+    bag = Bag("tmp",tmpbag=True)
+    bag.add_tiddlers(self.final_tiddlers)
+    tiddlers = control.filter_tiddlers_from_bag(bag,'sort=%s'%self.arg2) 
+    self.final_tiddlers = list(tiddlers)
+
   def saveAndFilterArg(self,token):
-    
-    if self.arg1 == 'server.bag':
-      self.arg1 = "bag"
+    #print "saveAndArg %s and %s"%(self.arg1,self.arg2)
     if self.arg1 == 'sort' or self.arg1 == 'limit':
       self.filter += "&%s=%s"%(self.arg1,self.arg2)
     else:
-      self.filter += "&select=%s:%s"%(self.arg1,self.arg2)
+        self.and_tiddlers = self.match_tiddlers(self.and_tiddlers,self.arg1,self.arg2)
+    
     self.reset_args()
+    self.write_to_arg1(token)
     logging.debug("in saveAndFilter:%s "%self.filter)
   def applyAndFilter(self,token):
+    #print "saveAndFilter %s and %s"%(self.arg1,self.arg2)      
     logging.debug("in applyAndFilter:")
     self.saveAndFilterArg(token)
-    logging.debug("applyAndFilter: filter=%s"%self.filter)
-    newtiddlers = control.filter_tiddlers_from_bag(self.bag,self.filter)
-    for tiddler in newtiddlers:
+
+    for tiddler in self.and_tiddlers:
       if tiddler not in self.final_tiddlers:
         self.final_tiddlers.append(tiddler)
     self.reset_args()
+    self.and_tiddlers = self.bag.list_tiddlers()
+  
+  def match_tiddlers(self,tiddlers,field,val):
+      if val[0] == '!':
+          val = val[1:]
+          negation_mode = True
+      else:
+          negation_mode = False
+      if field == 'server.bag':
+          field = "bag"
+      if field == 'tag':
+          field= 'tags'
+      final =[]
+      for tiddler in tiddlers:
+        if tiddler not in final:
+            try:
+                fieldval = getattr(tiddler,field)
+            except AttributeError:
+                if field in tiddler.fields:
+                    fieldval = tiddler.fields[field]
+                else:
+                    fieldval = ""
+            result = False
+            if type(fieldval) == type([]):
+                if val in fieldval:
+                    result = True
+            else:
+                if val == fieldval:
+                    result = True
+            if negation_mode:
+                result = not result
+            if result:
+                final.append(tiddler)
+      return final
+      
   def applyORFilter(self,token):   
     logging.debug("applyORFilter: apply or filter %s"%self.arg1)
-    if self.arg1 == 'server.bag':
-      self.arg1 = "bag"
+    #print "saveOR %s and %s"%(self.arg1,self.arg2)    
     try:
-      try:
-        index = self.arg1.index("sort")
-        logging.debug("applyORFilter: found index %s"%index)
-        self.apply_sort()
-      except ValueError:
-        index = self.arg1.index("limit")
-        self.apply_limit()
+        try:
+            index = self.arg1.index("sort")
+            logging.debug("applyORFilter: found index %s"%index)
+            self.apply_sort()
+        except ValueError:
+            index = self.arg1.index("limit")
+            self.apply_limit()
     except ValueError:
-      newtiddlers = control.filter_tiddlers_from_bag(self.bag,"select=%s:%s"%(self.arg1,self.arg2))
-      for tiddler in newtiddlers:
-        if tiddler not in self.final_tiddlers:
-          self.final_tiddlers.append(tiddler)
-      
+        newtiddlers = self.bag.list_tiddlers()
+        newtiddlers = self.match_tiddlers(newtiddlers,self.arg1,self.arg2)
+        for tid in newtiddlers:
+            if tid not in self.final_tiddlers:
+                self.final_tiddlers.append(tid)
+        
     self.reset_args()
   def get_filter_tiddlers(self,bag,filterstring):
     logging.debug("Filterer get_filter_tiddlers filter string=%s"%filterstring)
@@ -117,6 +123,7 @@ class Filterer:
     self.bag = bag
     self.final_tiddlers = []
     self.filter = u""
+    self.and_tiddlers = self.bag.list_tiddlers()
     
     for token in filterstring:
       state = self.run(state,token)
@@ -129,13 +136,14 @@ class Filterer:
   def run(self,state,token):
     logging.debug("Filterer.run: in state %s with token %s "%(state,token))
     #logging.debug("filter:in state %s with %s"%(state,token))
+    #print "in state %s with token %s"%(state,token)
     if state == 'A':
-      self.write_to_arg1(token)
       if token =='[':
         return 'B'
       elif token == ' ' or token =='\n':
         return "A"
       else:
+        self.write_to_arg1(token)
         return "Y"
     elif state == 'Y':
       self.write_to_arg1(token)
@@ -199,3 +207,7 @@ class Filterer:
         self.saveAndFilterArg(token)
         return 'I'
 
+def filter_tiddlers(bag_of_tiddlers,filter_string):
+    f = Filterer()
+    tiddlers = f.get_filter_tiddlers(bag_of_tiddlers,filter_string)
+    return tiddlers

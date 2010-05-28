@@ -12,6 +12,10 @@ from tiddlywebplugins.wikklytextplugins.filterer import Filterer as FilterThingy
 from tiddlyweb import control
 from tiddlyweb.web.util import encode_name
 from datetime import date
+from wikklytext.plugapi import SPAN, Text, eval_wiki_text
+from wikklytext.base import Element
+
+
 def _throw_error():
     return "<span class='wikkly-error-container'>running old version of TiddlyWeb</span>"  
 def tiddler(context, *args):
@@ -128,10 +132,10 @@ def _view_transform(context,value,vtype,named_args={}):
             transformed = value
             out += transformed
         elif vtype == 'wikified':
-            out += wikitext_to_wikklyhtml(base,path, value, environ,tiddler=context.tiddler)
+            out += wikitext_to_wikklyhtml(base,path, value, environ,wikiwords=False,tiddler=context.tiddler)
         elif vtype =='link':
-            value = "[[%s]]"%value
-            out += wikitext_to_wikklyhtml(base,path, value, environ,tiddler=context.tiddler)
+            value = "[[%s]]"%(value)
+            out += wikitext_to_wikklyhtml(base,path, value, environ,wikiwords=False,tiddler=context.tiddler)
         elif vtype=='date':
             YYYY = int(value[0:4])
             MM = int(value[4:6])
@@ -150,6 +154,8 @@ def _view_transform(context,value,vtype,named_args={}):
     return out
     
 def tags(context,*args):
+    base = context.var_get_text("$BASE_URL")
+    path =""
     try:
         tiddler = context.tiddler
     except NoAttributeError:
@@ -161,11 +167,11 @@ def tags(context,*args):
     else:
         tagresult +=u"<li class=\"listTitle\">tags: </li>"
         for tag in tiddler.tags:
-            taglink = "%s"%tag
+            taglink = "%s"%wikitext_to_wikklyhtml(base,path, "[[%s]]"%tag, context.environ,wikiwords=False,tiddler=context.tiddler)
             tagresult += "<li>%s</li>"%(taglink)
   
     tagresult += "</ul>"
-    return tagresult
+    return "<nowiki>%s</nowiki>"%tagresult
   
 def view(context, *args):
     params = []
@@ -201,4 +207,6 @@ def view(context, *args):
     #logging.debug("view lastnamed args %s"%params)
     p = params[2:]
     res = _view_transform(context,val,viewtype,named_args=parseParams(args))
-    return res
+    
+  
+    return u"<nowiki>%s</nowiki>"%res

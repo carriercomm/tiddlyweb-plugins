@@ -11,7 +11,7 @@ test_tiddler.revision = 2
 
 def test_view_date():
     out = macros.view(WikiContext(test_tiddler,{}), WikiArgument("modified"),WikiArgument("date"))
-    assert '03 October 2007' == out
+    assert '03 October 2007' in out
     
 def test_view_text():
     text ="My name is the test tiddler!"
@@ -25,13 +25,13 @@ def test_view_text():
     assert 'Test Tiddler' in out
     
     out = macros.view(WikiContext(test_tiddler,{}), WikiArgument("server.bag"),WikiArgument("text"))
-    assert out == 'bag'
+    assert 'bag' in out 
     
     out = macros.view(WikiContext(test_tiddler,{}), WikiArgument("server.page.revision"),WikiArgument("text"))
-    assert out == '2'
+    assert '2' in out
     
     out = macros.view(WikiContext(test_tiddler,{}), WikiArgument("tags"),WikiArgument("text"))
-    assert out == 'jon ben [[jeremy ruston]]'
+    assert 'jon ben [[jeremy ruston]]' in out
     
     
 def test_view_wikified():

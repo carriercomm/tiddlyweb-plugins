@@ -10,6 +10,6 @@ def test_tags():
     env = {}
     out = macros.tags(WikiContext(tid,env))
     assert '</li>' in out
-    assert 'ab</li>' in out
-    assert 'cd</li>' in out
+    assert 'ab</a></li>' in out
+    assert 'cd</a></li>' in out
     assert '</ul>' in out

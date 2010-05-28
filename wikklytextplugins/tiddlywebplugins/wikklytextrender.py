@@ -28,7 +28,7 @@ def render(tiddler, environ):
     return unicode(html, 'utf-8')
 
 
-def wikitext_to_wikklyhtml(base_url, path_url, wikitext, environ,tiddler=False,bag=False,wikiwords=False):
+def wikitext_to_wikklyhtml(base_url, path_url, wikitext, environ,tiddler=False,wikiwords=False):
     """
     Turn a wikitext into HTML.
     base_url: starting url for links in the wikitext (e.g. '/')
@@ -43,7 +43,7 @@ def wikitext_to_wikklyhtml(base_url, path_url, wikitext, environ,tiddler=False,b
             return url_fragment, True
         return '%s%s' % (base_url, urllib.quote(url_fragment, safe='')), False
 
-    posthook = PostHook()
+    posthook = PostHook(wikiwords)
 
     safe_mode_setting = environ.get('tiddlyweb.config', {}).get(
             'wikklytext.safe_mode', True)
@@ -56,11 +56,10 @@ def wikitext_to_wikklyhtml(base_url, path_url, wikitext, environ,tiddler=False,b
         context = wikklytext.WikContext(plugin_dirs=plugindir,url_resolver=our_resolver)
         context.environ = environ
         context.tiddler = tiddler
-        context.wikiwords = wikiwords
         html,newcontext = wikklytext.WikklyText_to_InnerHTML(
                 text=wikitext,
                 context = context,
-                plugin_dirs=plugindir,
+                plugin_dirs=plugindir,  
                 setvars=link_context,
                 encoding='utf-8',
                 safe_mode=safe_mode_setting,
@@ -78,17 +77,20 @@ class PostHook(object):
     tree with need to link up the wiki words.
     """
 
-    def __init__(self):
+    def __init__(self,on=True):
         # make map of wikiwords
         self.wikiwords = InfiniteDict()
-
+        self.on = on
     def treehook(self, rootnode, context):
         """
         Turn wikiwords into links.
         """
-        from wikklytext.wikwords import wikiwordify
-        # add links to any wikiword
-        wikiwordify(rootnode, context, self.wikiwords)
+        if not self.on:
+            pass
+        else:
+            from wikklytext.wikwords import wikiwordify
+            # add links to any wikiword
+            wikiwordify(rootnode, context, self.wikiwords)
 
 
 class InfiniteDict(dict):

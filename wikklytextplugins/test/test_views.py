@@ -51,8 +51,11 @@ def test_view_wikified():
     test_tiddler.text = '[[out]]'
     out = macros.view(WikiContext(test_tiddler,{}), WikiArgument("text"), WikiArgument("wikified"))
     assert "</a>" in out
-    
+
+  
 def test_view_link():
+    config['wikklytext.safe_mode'] = False
+    wikklytextplugins.init(config)
     link_context = {
             '$BASE_URL': '/test/bags/foo/tiddlers',
             '$REFLOW': 0
@@ -64,6 +67,20 @@ def test_view_link():
     assert 'href="/test/bags/foo/tiddlers/Test%20Tiddler"' in out
     test_tiddler.fields['bar'] = "80 days"
     test_tiddler.text = "<<view bar linkexternal withlotsargument: 'wondering how this might show' inparams: becauseihavenoidea foo:bar prefix:'around the world in/'>>"
-    wikklytextplugins.init(config)
     text = wikklytextrender.render(test_tiddler,{'tiddlyweb.config':config})
     assert 'around the world in/80%20days' in text
+
+def test_view_wikiwords_link():
+    wikklytextplugins.init(config)
+    test_tiddler = Tiddler("Email, Notifications, Atom Feeds and WikklyText")
+    test_tiddler.text = "<<view title linkexternal prefix:/posts/>>"
+    
+    link_context = {
+            '$BASE_URL': '/test',
+            '$REFLOW': 0
+    }
+    out = macros.view(WikiContext(test_tiddler,{},link_context), WikiArgument("title"),WikiArgument("linkexternal"),WikiArgument("prefix:/posts/"))
+    assert 'a href=' in out
+    assert '/test' not in out
+    assert '/posts/Email%2C%20Notifications%2C%20Atom%20Feeds%20and%20WikklyText' in out
+    

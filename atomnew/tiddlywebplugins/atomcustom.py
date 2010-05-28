@@ -200,8 +200,18 @@ class Serialization(SerializationInterface):
                     resource_name =urllib.quote(self.environ['selector.vars']['bag_name'])
                     resource_type ="bag"
                 except KeyError:
-                    resource_name =self.environ['selector.vars']['recipe_name']
-                    resource_type ="recipe"
+                    try:
+                        resource_name =self.environ['selector.vars']['recipe_name']
+                        resource_type ="recipe"
+                    except KeyError:
+                        wsgirouting = self.environ['wsgiorg.routing_args'][1]
+                        if "recipe_name" in wsgirouting:
+                            resource_name = wsgirouting["recipe_name"]
+                            resource_type = "recipe"
+                        else:
+                            resource_name = wsgirouting["bag_name"]
+                            resource_type = "bag"
+                            
                 settings = self.get_atom_config(resource_type,resource_name)
                 baseuri =    "%s://%s/%s"%(environ['tiddlyweb.config']['server_host']['scheme'],environ['tiddlyweb.config']['server_host']['host'],environ['tiddlyweb.config']['server_prefix'])
                 
@@ -216,9 +226,12 @@ class Serialization(SerializationInterface):
                     atom_link = baseuri
                     if "SCRIPT_URI" in environ:
                         atom_link += environ['SCRIPT_URI']
-                
+                        uri =self.environ['SCRIPT_URI']
+                    else:
+                        atom_link += environ['SCRIPT_NAME']
+                        uri =self.environ['SCRIPT_NAME']
 
-                uri =self.environ['SCRIPT_URI']
+                
                 output ="""<?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom"
 	xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#"

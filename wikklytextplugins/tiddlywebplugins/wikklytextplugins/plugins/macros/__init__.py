@@ -14,14 +14,61 @@ from tiddlyweb.web.util import encode_name
 from datetime import date
 from wikklytext.plugapi import SPAN, Text, eval_wiki_text
 from wikklytext.base import Element
+from tiddlyweb.config import config
 
-
+def WikiArgument(val):
+    arg1 = Element("text")
+    arg1.text = val
+    return arg1
+    
 def _throw_error():
     return "<span class='wikkly-error-container'>running old version of TiddlyWeb</span>"  
+    
+def tiddlers(context, *args):
+    base = context.var_get_text("$BASE_URL")
+    path = ""
+    
+    if not context.environ:
+        return ""
+    else:
+      environ = context.environ
+    
+    store = get_store(config)
+    
+    tid = context.tiddler
+    if tid.recipe:
+        tids = control.get_tiddlers_from_recipe(store.get(Recipe(tid.recipe)))
+    elif tid.bag:
+        bag = store.get(Bag(tid.bag))
+        tids = list(bag.list_tiddlers())
+    else:
+        return u""
+    
+    tiddlerTemplate = args[0].text
+    templateText = ""  
+    for tid in tids:
+        tid = store.get(tid)
+        if tid.title == tiddlerTemplate:
+            templateText = tid.text
+    p = parseParams(args)
+    if "filter" in p:
+        filterBag = Bag("filter",tmpbag=True)
+        filterBag.add_tiddlers(tids)
+        filtered_tiddlers = filter_tiddlers(filterBag,p["filter"])
+        output = u""
+        for filtered_tiddler in filtered_tiddlers:
+            output += u"%s"%wikitext_to_wikklyhtml(base,path, templateText, environ,tiddler=filtered_tiddler)
+        return "<html>%s</html>"%output
+    else:
+        return u""
+      
 def tiddler(context, *args):
     base = context.var_get_text("$BASE_URL")
     path =""
-    store = get_store(context.environ)
+    if not context.environ:
+      return ""
+    
+    store = get_store(config)
     logging.debug("in tiddler macro")
     try:
         environ = context.environ
@@ -40,16 +87,16 @@ def tiddler(context, *args):
         return ""
     try:
         tiddler_requested = args[0].text
+        for tiddler in tids:
+            if tiddler.title == tiddler_requested:
+                tiddler = store.get(tiddler)
     except Exception:
-        tiddler_requested = ""
-    for tiddler in tids:
-        if tiddler.title == tiddler_requested:
-            tiddler = store.get(tiddler)
-            print tiddler.text
-            text = wikitext_to_wikklyhtml(base,path, tiddler.text, environ,tiddler=context.tiddler)
-            print text
-            return text
-    return ""#no tiddler with that name
+        tiddler = context.tiddler
+    if tiddler:
+        text = wikitext_to_wikklyhtml(base,path, tiddler.text, environ,tiddler=context.tiddler)
+        return "%s"%text
+    else:
+        return ""#no tiddler with that name
 
 def parseParams(params):
     newargs = []
@@ -171,7 +218,7 @@ def tags(context,*args):
             tagresult += "<li>%s</li>"%(taglink)
   
     tagresult += "</ul>"
-    return "<nowiki>%s</nowiki>"%tagresult
+    return "<html>%s</html>"%tagresult
   
 def view(context, *args):
     params = []
@@ -209,45 +256,5 @@ def view(context, *args):
     res = _view_transform(context,val,viewtype,named_args=parseParams(args))
     
   
-    return u"<nowiki>%s</nowiki>"%res
+    return u"<html>%s</html>"%res
     
-   
-global TIDDLER_MACRO
-TIDDLER_MACRO = tiddler
-def tiddlers(context, *args):
-    #work out recipe..
-    logging.debug("in tiddlers macro")
-    environ = context.environ
-    params = []
-    template = args[0] #tiddler to pass it through
-    bag_of_tiddlers = Bag("tmp",tmpbag=True)
-    tiddler = context.tiddler
-    store = get_store(environ)
-    if tiddler.bag:
-        bag_of_tiddlers = store.get(Bag(tiddler.bag))
-    else:
-        pass
-    named_args = parseParams(args)
-    tw_filter = named_args["filter"]
-
-    logging.debug("in tiddlers with tw filter %s"%(tw_filter))
-    filtered_tiddler_list = filter_tiddlers(bag_of_tiddlers,tw_filter)
-    result = u""
-    listlen = 0
-    for newtiddler in filtered_tiddler_list:
-      listlen +=1
-      newcontext = context.clone()
-      newcontext.environ = environ
-      newcontext.tiddler = newtiddler
-      tiddler_result = TIDDLER_MACRO(newcontext,template)
-      result += tiddler_result    
-    if listlen > 0:
-      return result
-    else:
-      if "ifEmpty" in named_args:
-        template_arg = Text(named_args["ifEmpty"])
-        return TIDDLER_MACRO(context,template_arg)
-      elif "ifEmptyString" in named_args:
-        return named_args["ifEmptyString"]
-      else:
-        return ""

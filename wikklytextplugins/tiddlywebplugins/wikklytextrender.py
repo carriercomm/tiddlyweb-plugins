@@ -53,7 +53,7 @@ def wikitext_to_wikklyhtml(base_url, path_url, wikitext, environ,tiddler=False,w
             '$REFLOW': 0}
     plugindir = environ.get('tiddlyweb.config', {}).get('wikklytext.plugin-dir','')
     try:
-        context = wikklytext.WikContext(plugin_dirs=plugindir,url_resolver=our_resolver)
+        context = wikklytext.WikContext(plugin_dirs=plugindir,url_resolver=our_resolver,restricted_mode=safe_mode_setting)
         context.environ = environ
         context.tiddler = tiddler
         html,newcontext = wikklytext.WikklyText_to_InnerHTML(

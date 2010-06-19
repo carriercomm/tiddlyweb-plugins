@@ -8,7 +8,7 @@ from tiddlywebplugins.utils import get_store
 from tiddlyweb.model.recipe import Recipe
 from tiddlyweb.model.tiddler import Tiddler
 from tiddlyweb.store import Store, NoBagError,NoTiddlerError
-from tiddlywebplugins.wikklytextplugins.filterer import Filterer as FilterThingy
+from tiddlywebplugins.wikklytextplugins.filterer import filter_tiddlers
 from tiddlyweb import control
 from tiddlyweb.web.util import encode_name
 from datetime import date
@@ -210,3 +210,44 @@ def view(context, *args):
     
   
     return u"<nowiki>%s</nowiki>"%res
+    
+   
+global TIDDLER_MACRO
+TIDDLER_MACRO = tiddler
+def tiddlers(context, *args):
+    #work out recipe..
+    logging.debug("in tiddlers macro")
+    environ = context.environ
+    params = []
+    template = args[0] #tiddler to pass it through
+    bag_of_tiddlers = Bag("tmp",tmpbag=True)
+    tiddler = context.tiddler
+    store = get_store(environ)
+    if tiddler.bag:
+        bag_of_tiddlers = store.get(Bag(tiddler.bag))
+    else:
+        pass
+    named_args = parseParams(args)
+    tw_filter = named_args["filter"]
+
+    logging.debug("in tiddlers with tw filter %s"%(tw_filter))
+    filtered_tiddler_list = filter_tiddlers(bag_of_tiddlers,tw_filter)
+    result = u""
+    listlen = 0
+    for newtiddler in filtered_tiddler_list:
+      listlen +=1
+      newcontext = context.clone()
+      newcontext.environ = environ
+      newcontext.tiddler = newtiddler
+      tiddler_result = TIDDLER_MACRO(newcontext,template)
+      result += tiddler_result    
+    if listlen > 0:
+      return result
+    else:
+      if "ifEmpty" in named_args:
+        template_arg = Text(named_args["ifEmpty"])
+        return TIDDLER_MACRO(context,template_arg)
+      elif "ifEmptyString" in named_args:
+        return named_args["ifEmptyString"]
+      else:
+        return ""

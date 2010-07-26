@@ -1,0 +1,67 @@
+Unpacking ./dist/tiddlywebplugins.pngserializer-0.3.tar.gz
+  Running setup.py egg_info for package from file:///svn/gitme/tiddlyweb-plugins/pngserialization/dist/tiddlywebplugins.pngserializer-0.3.tar.gz
+    running egg_info
+    creating pip-egg-info/tiddlywebplugins.pngserializer.egg-info
+    writing pip-egg-info/tiddlywebplugins.pngserializer.egg-info/PKG-INFO
+    writing namespace_packages to pip-egg-info/tiddlywebplugins.pngserializer.egg-info/namespace_packages.txt
+    writing top-level names to pip-egg-info/tiddlywebplugins.pngserializer.egg-info/top_level.txt
+    writing dependency_links to pip-egg-info/tiddlywebplugins.pngserializer.egg-info/dependency_links.txt
+    writing manifest file 'pip-egg-info/tiddlywebplugins.pngserializer.egg-info/SOURCES.txt'
+    warning: manifest_maker: standard file '-c' not found
+    reading manifest file 'pip-egg-info/tiddlywebplugins.pngserializer.egg-info/SOURCES.txt'
+    writing manifest file 'pip-egg-info/tiddlywebplugins.pngserializer.egg-info/SOURCES.txt'
+Installing collected packages: tiddlywebplugins.pngserializer
+  Running setup.py install for tiddlywebplugins.pngserializer
+    Running command /System/Library/Frameworks/Python.framework/Versions/2.5/Resources/Python.app/Contents/MacOS/Python -c "import setuptools; __file__='/var/folders/iL/iL10fhZEGxSlS0Wo3oeYE++++TM/-Tmp-/pip-8G5xev-build/setup.py'; execfile('/var/folders/iL/iL10fhZEGxSlS0Wo3oeYE++++TM/-Tmp-/pip-8G5xev-build/setup.py')" install --single-version-externally-managed --record /var/folders/iL/iL10fhZEGxSlS0Wo3oeYE++++TM/-Tmp-/pip-a-Et74-record/install-record.txt --install-headers /var/folders/iL/iL10fhZEGxSlS0Wo3oeYE++++TM/lib/include
+    running install
+    running build
+    running build_py
+    creating build
+    creating build/lib
+    creating build/lib/tiddlywebplugins
+    copying tiddlywebplugins/__init__.py -> build/lib/tiddlywebplugins
+    copying tiddlywebplugins/png.py -> build/lib/tiddlywebplugins
+    running install_lib
+    Skipping installation of /Library/Python/2.5/site-packages/tiddlywebplugins/__init__.py (namespace package)
+    copying tiddlywebplugins/png.py -> /Library/Python/2.5/site-packages/tiddlywebplugins
+    error: /Library/Python/2.5/site-packages/tiddlywebplugins/png.py: Permission denied
+    Complete output from command /System/Library/Frameworks/Python.framework/Versions/2.5/Resources/Python.app/Contents/MacOS/Python -c "import setuptools; __file__='/var/folders/iL/iL10fhZEGxSlS0Wo3oeYE++++TM/-Tmp-/pip-8G5xev-build/setup.py'; execfile('/var/folders/iL/iL10fhZEGxSlS0Wo3oeYE++++TM/-Tmp-/pip-8G5xev-build/setup.py')" install --single-version-externally-managed --record /var/folders/iL/iL10fhZEGxSlS0Wo3oeYE++++TM/-Tmp-/pip-a-Et74-record/install-record.txt --install-headers /var/folders/iL/iL10fhZEGxSlS0Wo3oeYE++++TM/lib/include:
+    running install
+
+running build
+
+running build_py
+
+creating build
+
+creating build/lib
+
+creating build/lib/tiddlywebplugins
+
+copying tiddlywebplugins/__init__.py -> build/lib/tiddlywebplugins
+
+copying tiddlywebplugins/png.py -> build/lib/tiddlywebplugins
+
+running install_lib
+
+Skipping installation of /Library/Python/2.5/site-packages/tiddlywebplugins/__init__.py (namespace package)
+
+copying tiddlywebplugins/png.py -> /Library/Python/2.5/site-packages/tiddlywebplugins
+
+error: /Library/Python/2.5/site-packages/tiddlywebplugins/png.py: Permission denied
+
+----------------------------------------
+Command /System/Library/Frameworks/Python.framework/Versions/2.5/Resources/Python.app/Contents/MacOS/Python -c "import setuptools; __file__='/var/folders/iL/iL10fhZEGxSlS0Wo3oeYE++++TM/-Tmp-/pip-8G5xev-build/setup.py'; execfile('/var/folders/iL/iL10fhZEGxSlS0Wo3oeYE++++TM/-Tmp-/pip-8G5xev-build/setup.py')" install --single-version-externally-managed --record /var/folders/iL/iL10fhZEGxSlS0Wo3oeYE++++TM/-Tmp-/pip-a-Et74-record/install-record.txt --install-headers /var/folders/iL/iL10fhZEGxSlS0Wo3oeYE++++TM/lib/include failed with error code 1
+Exception information:
+Traceback (most recent call last):
+  File "/Library/Python/2.5/site-packages/pip/basecommand.py", line 115, in main
+    self.run(options, args)
+  File "/Library/Python/2.5/site-packages/pip/commands/install.py", line 157, in run
+    requirement_set.install(install_options)
+  File "/Library/Python/2.5/site-packages/pip/req.py", line 1165, in install
+    requirement.install(install_options)
+  File "/Library/Python/2.5/site-packages/pip/req.py", line 533, in install
+    cwd=self.source_dir, filter_stdout=self._filter_install, show_stdout=False)
+  File "/Library/Python/2.5/site-packages/pip/__init__.py", line 207, in call_subprocess
+    % (command_desc, proc.returncode))
+InstallationError: Command /System/Library/Frameworks/Python.framework/Versions/2.5/Resources/Python.app/Contents/MacOS/Python -c "import setuptools; __file__='/var/folders/iL/iL10fhZEGxSlS0Wo3oeYE++++TM/-Tmp-/pip-8G5xev-build/setup.py'; execfile('/var/folders/iL/iL10fhZEGxSlS0Wo3oeYE++++TM/-Tmp-/pip-8G5xev-build/setup.py')" install --single-version-externally-managed --record /var/folders/iL/iL10fhZEGxSlS0Wo3oeYE++++TM/-Tmp-/pip-a-Et74-record/install-record.txt --install-headers /var/folders/iL/iL10fhZEGxSlS0Wo3oeYE++++TM/lib/include failed with error code 1
